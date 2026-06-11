@@ -1,10 +1,11 @@
 /* FUEL Ninja — service worker: cache-first so the home-screen app works offline */
-const CACHE = 'fuel-ninja-v5';
+const CACHE = 'fuel-ninja-v6';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './assets/fuel-logo-ig.jpg',
+  './assets/bg-truck.jpg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-180.png'

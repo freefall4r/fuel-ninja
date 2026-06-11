@@ -263,6 +263,12 @@ let logoReady = false;
 logoImg.onload = () => { logoReady = true; drawBackground(); };
 logoImg.src = 'assets/fuel-logo-ig.jpg';
 
+// generated photo backdrop of the real FUEL truck (dusk, dark centre for gameplay)
+const bgImg = new Image();
+let bgReady = false;
+bgImg.onload = () => { bgReady = true; drawBackground(); };
+bgImg.src = 'assets/bg-truck.jpg';
+
 let W = 0, H = 0, DPR = 1, BASE = 800;
 function resize(){
   DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -360,6 +366,29 @@ function quad(pts, style){
 }
 function drawBackground(){
   bgx.clearRect(0,0,W,H);
+
+  // ---- photo backdrop of the real FUEL truck (preferred) ----
+  if (bgReady){
+    bgx.fillStyle = '#0a0b0e'; bgx.fillRect(0,0,W,H);
+    // cover-fit the wide image, centred
+    const ir = bgImg.width/bgImg.height, sr = W/H;
+    let dw, dh;
+    if (sr > ir){ dw = W; dh = W/ir; } else { dh = H; dw = H*ir; }
+    bgx.drawImage(bgImg, (W-dw)/2, (H-dh)/2, dw, dh);
+    // readability vignette: darken the centre so flying burgers stay clear
+    const vg = bgx.createRadialGradient(W*0.5, H*0.52, BASE*0.10, W*0.5, H*0.55, Math.max(W,H)*0.62);
+    vg.addColorStop(0, 'rgba(6,7,10,0.55)');
+    vg.addColorStop(0.55,'rgba(6,7,10,0.30)');
+    vg.addColorStop(1, 'rgba(6,7,10,0.78)');
+    bgx.fillStyle = vg; bgx.fillRect(0,0,W,H);
+    // subtle top + bottom grade for depth
+    const tb = bgx.createLinearGradient(0,0,0,H);
+    tb.addColorStop(0,'rgba(0,0,0,0.30)'); tb.addColorStop(0.5,'rgba(0,0,0,0)'); tb.addColorStop(1,'rgba(0,0,0,0.45)');
+    bgx.fillStyle = tb; bgx.fillRect(0,0,W,H);
+    return;
+  }
+
+  // ---- vector fallback (until the photo loads) ----
   const cx = W*0.5, vpY = H*0.46;                       // vanishing area
   const iw = Math.min(W*0.5, BASE*0.66);
   const ih = Math.min(H*0.5, iw*0.74);
