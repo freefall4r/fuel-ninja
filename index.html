@@ -121,6 +121,28 @@
   .cta:hover b{color:#000;}
   @media (max-height:520px){ .cta{margin-top:8px;padding:6px 12px;} }
 
+  /* install / add-to-home-screen */
+  .install-pill{margin-top:14px;pointer-events:auto;cursor:pointer;
+    font-family:'Cairo',sans-serif;font-weight:900;font-size:clamp(12px,3vw,15px);
+    color:#fff;background:linear-gradient(#1c1e23,#0c0d10);border:1.5px solid var(--yellow);
+    padding:11px 20px;border-radius:30px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 0 16px #e6343640;transition:transform .1s, box-shadow .15s;}
+  .install-pill b{color:var(--yellow);}
+  .install-pill:hover{transform:translateY(-1px);box-shadow:0 0 24px #e6343675;}
+  .install-pill:active{transform:translateY(1px);}
+  @media (max-height:520px){ .install-pill{margin-top:8px;padding:8px 16px;} }
+
+  .ios-hint{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:#000b;backdrop-filter:blur(5px);pointer-events:auto;text-align:center;}
+  .ios-card{max-width:430px;background:#15171c;border:1.5px solid var(--yellow);
+    border-radius:18px;padding:26px 22px;box-shadow:0 0 40px #e6343655;}
+  .ios-big{font-size:50px;line-height:1;}
+  .ios-t1{font-family:'Anton',sans-serif;font-size:24px;color:#fff;margin-top:8px;letter-spacing:1px;}
+  .ios-t2{font-family:'Cairo',sans-serif;font-weight:700;font-size:15px;color:#eaeaea;margin-top:12px;line-height:1.7;}
+  .ios-t2 b{color:var(--yellow);}
+  .ios-t2 .shareico{display:inline-block;border:1.5px solid #8ab4ff;border-radius:5px;padding:0 6px;color:#8ab4ff;font-weight:900;}
+  .ios-x{margin-top:18px;font-family:'Cairo',sans-serif;font-weight:700;font-size:12px;color:#ffffff77;}
+
   .go-title{font-size:clamp(46px,12vw,100px);color:#fff;line-height:.85;
     text-shadow:3px 4px 0 #000;-webkit-text-stroke:1px #000;transform:skewX(-7deg);}
   .go-sub{font-family:'Cairo',sans-serif;font-weight:900;color:var(--yellow);font-size:18px;margin-top:6px;}
@@ -201,6 +223,7 @@
   </div>
   <button class="btn" id="playBtn">PLAY <span class="ar">يلا</span></button>
   <div class="hint">Drag / swipe with mouse or finger to slash</div>
+  <button class="install-pill hidden" id="installBtn">📲 <b>Install app</b> · add to home screen</button>
 </div>
 
 <!-- GAME OVER -->
@@ -221,6 +244,17 @@
 
 <div class="footer">FUEL · NINJA · Abdoun, Amman ⚡</div>
 <button id="muteBtn" aria-label="toggle sound">🔊</button>
+
+<!-- iOS "add to home screen" instructions (Apple blocks programmatic install) -->
+<div class="ios-hint hidden" id="iosHint">
+  <div class="ios-card">
+    <div class="ios-big">📲⚡</div>
+    <div class="ios-t1">Install FUEL Ninja</div>
+    <div class="ios-t2">In Safari, tap <b>Share</b> <span class="shareico">↑</span> at the bottom of the screen,
+      then choose <b>“Add to Home Screen.”</b> It opens fullscreen, like an app.</div>
+    <div class="ios-x">tap anywhere to close</div>
+  </div>
+</div>
 
 <!-- ROTATE TO LANDSCAPE (phones) -->
 <div id="rotate">
@@ -1078,7 +1112,17 @@ function gameOver(){
     goEl.classList.remove('hidden');
   }, 650);
 }
-document.getElementById('playBtn').addEventListener('click', () => { audio(); sfx.rev(); startGame(); });
+// go fullscreen on a real tap (browser case; ignored where unsupported e.g. iPhone Safari)
+function goFullscreen(){
+  try{
+    const el = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement){
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen;
+      if (req) req.call(el);
+    }
+  }catch(e){}
+}
+document.getElementById('playBtn').addEventListener('click', () => { audio(); goFullscreen(); sfx.rev(); startGame(); });
 document.getElementById('againBtn').addEventListener('click', () => { audio(); sfx.rev(); startGame(); });
 
 const muteBtn = document.getElementById('muteBtn');
@@ -1097,6 +1141,36 @@ for (const b of document.querySelectorAll('.btn')){
   b.addEventListener('pointerdown', () => { audio(); sfx.click(); });
 }
 renderMute();
+
+// ============================================================= install (Add to Home Screen)
+const installBtn = document.getElementById('installBtn');
+const iosHint = document.getElementById('iosHint');
+const isStandalone = matchMedia('(display-mode: standalone)').matches
+  || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+let deferredPrompt = null;
+
+// Chromium (Android/desktop): capture the install event, reveal the button
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e;
+  if (!isStandalone && installBtn) installBtn.classList.remove('hidden');
+});
+window.addEventListener('appinstalled', () => { installBtn && installBtn.classList.add('hidden'); deferredPrompt = null; });
+
+// iOS has no install API — still show the button so we can give instructions
+if (isIOS && !isStandalone && installBtn) installBtn.classList.remove('hidden');
+
+installBtn && installBtn.addEventListener('click', async () => {
+  audio(); sfx.click();
+  if (deferredPrompt){                 // Android / Chromium: native one-tap install
+    deferredPrompt.prompt();
+    try { await deferredPrompt.userChoice; } catch(e){}
+    deferredPrompt = null; installBtn.classList.add('hidden');
+  } else if (iosHint){                  // iPhone: show the Add-to-Home-Screen steps
+    iosHint.classList.remove('hidden');
+  }
+});
+iosHint && iosHint.addEventListener('click', () => iosHint.classList.add('hidden'));
 
 // ============================================================= effects state
 let flash = 0, flashColor = '255,210,0';

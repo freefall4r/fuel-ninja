@@ -1,5 +1,5 @@
 /* FUEL Ninja — service worker: cache-first so the home-screen app works offline */
-const CACHE = 'fuel-ninja-v1';
+const CACHE = 'fuel-ninja-v2';
 const ASSETS = [
   './',
   './index.html',
