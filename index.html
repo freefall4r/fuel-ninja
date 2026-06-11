@@ -187,7 +187,56 @@
     .go-title{font-size:clamp(30px,11vh,60px);}
     .go-score .val{font-size:54px;}
     .hud-score .val{font-size:34px;}
+    .join{margin-top:8px;padding:8px 10px;}
+    .board-banner{font-size:12px;padding:7px 10px;}
+    .board-list{max-height:46vh;}
   }
+
+  /* ---------- scoreboard link buttons ---------- */
+  .boardlink{margin-top:12px;pointer-events:auto;cursor:pointer;
+    font-family:'Cairo',sans-serif;font-weight:900;font-size:clamp(12px,3vw,15px);letter-spacing:.5px;
+    color:var(--yellow);background:#0008;border:1.5px solid var(--yellow);
+    padding:10px 20px;border-radius:30px;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .1s, background .15s;}
+  .boardlink b{color:#fff;}
+  .boardlink:hover{background:var(--yellow);} .boardlink:hover b,.boardlink:hover{color:#000;}
+  .boardlink:active{transform:translateY(1px);}
+
+  /* ---------- join-the-board form (game over) ---------- */
+  .join{margin-top:16px;background:#0006;border:1.5px solid #ffffff22;border-radius:14px;
+    padding:12px 14px;max-width:440px;width:92%;}
+  .join-t{font-family:'Cairo',sans-serif;font-weight:900;font-size:clamp(11px,2.8vw,14px);color:#fff;margin-bottom:9px;letter-spacing:.4px;}
+  .join-t b{color:var(--yellow);}
+  .join-row{display:flex;gap:8px;}
+  .join input{flex:1;min-width:0;background:#000;border:1.5px solid #ffffff30;border-radius:8px;
+    color:#fff;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;padding:9px 11px;outline:none;}
+  .join input:focus{border-color:var(--yellow);}
+  .join input::placeholder{color:#ffffff55;}
+  .btn.small{margin-top:9px;font-size:clamp(15px,4vw,18px);padding:9px 26px;width:100%;}
+  .join-msg{margin-top:8px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:#7CFFA0;}
+  .join-msg.err{color:#ff7a6a;}
+
+  /* ---------- scoreboard ---------- */
+  .board-title{font-family:'Anton',sans-serif;font-size:clamp(30px,8vw,52px);color:#fff;letter-spacing:1px;
+    transform:skewX(-7deg);line-height:.9;}
+  .board-title span{color:var(--yellow);}
+  .board-banner{margin-top:12px;background:var(--yellow);color:#000;font-family:'Anton',sans-serif;
+    font-size:clamp(13px,3.4vw,18px);letter-spacing:.5px;line-height:1.25;text-align:center;
+    padding:9px 16px;border-radius:8px;transform:skewX(-6deg);max-width:540px;}
+  .board-reset{margin-top:10px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;color:#ffffffaa;letter-spacing:.5px;}
+  .board-list{margin-top:14px;width:92%;max-width:480px;max-height:54vh;overflow-y:auto;
+    display:flex;flex-direction:column;gap:6px;}
+  .brow{display:flex;align-items:center;gap:10px;background:#ffffff0d;border:1px solid #ffffff14;
+    border-radius:10px;padding:9px 12px;}
+  .brow .rk{font-family:'Anton',sans-serif;font-size:18px;color:#fff8;width:30px;text-align:center;flex:none;}
+  .brow .nm{flex:1;min-width:0;font-family:'Cairo',sans-serif;font-weight:800;font-size:15px;color:#fff;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .brow .ig{font-family:'Cairo',sans-serif;font-weight:700;font-size:12px;color:var(--yellow);opacity:.9;}
+  .brow .sc{font-family:'Anton',sans-serif;font-size:20px;color:#fff;flex:none;}
+  .brow.top{background:linear-gradient(90deg,#e6343633,#0000);border-color:var(--yellow);}
+  .brow.top .rk{color:var(--yellow);}
+  .brow.me{outline:2px solid #ffffff44;}
+  .board-empty{font-family:'Cairo',sans-serif;font-weight:700;color:#ffffff77;padding:24px;text-align:center;}
 </style>
 </head>
 <body>
@@ -214,6 +263,7 @@
   <div class="ninja-tag">NINJA</div>
   <div class="tag"><span class="ar">قطّع البرجر… ولا تلمس الفلفل الحار 🌶️</span></div>
   <button class="btn" id="playBtn">PLAY <span class="ar">يلا</span></button>
+  <button class="boardlink" id="menuBoardBtn">🏆 <b>WEEKLY SCOREBOARD</b></button>
   <button class="install-pill hidden" id="installBtn">📲 <b>Install app</b> · add to home screen</button>
 </div>
 
@@ -227,7 +277,18 @@
     <div class="best" id="goBest">BEST 0</div>
     <div class="go-new hidden" id="goNew">★ TOP FUELER ★</div>
   </div>
+  <!-- join the weekly board -->
+  <div class="join" id="joinBox">
+    <div class="join-t">🏆 JOIN THE WEEKLY BOARD — <b>#1 EATS FREE ⚡</b></div>
+    <div class="join-row">
+      <input id="joinName" type="text" placeholder="Your name" maxlength="24" autocomplete="off">
+      <input id="joinIg" type="text" placeholder="@instagram" maxlength="30" autocomplete="off">
+    </div>
+    <button class="btn small" id="joinBtn">SUBMIT MY SCORE</button>
+    <div class="join-msg hidden" id="joinMsg"></div>
+  </div>
   <button class="btn" id="againBtn">PLAY AGAIN <span class="ar">كمان</span></button>
+  <button class="boardlink" id="goBoardBtn">🏆 <b>SEE THE SCOREBOARD</b></button>
   <a class="cta" href="https://www.instagram.com/fuel_foodtruck/" target="_blank" rel="noopener">
     📸 Screenshot your score &nbsp;·&nbsp; ⚡ Follow <b>@fuel_foodtruck</b>
   </a>
@@ -235,6 +296,15 @@
 
 <div class="footer">FUEL · NINJA · Abdoun, Amman ⚡</div>
 <button id="muteBtn" aria-label="toggle sound">🔊</button>
+
+<!-- WEEKLY SCOREBOARD -->
+<div class="overlay hidden" id="board">
+  <div class="board-title">WEEKLY <span>SCOREBOARD</span></div>
+  <div class="board-banner">SCOREBOARD RESETS EVERY THURSDAY NIGHT 23:59<br>GO GET YOUR FREE BURGERS!!!</div>
+  <div class="board-reset" id="boardReset"></div>
+  <div class="board-list" id="boardList"><div class="board-empty">Loading…</div></div>
+  <button class="btn" id="boardBack">BACK</button>
+</div>
 
 <!-- iOS "add to home screen" instructions (Apple blocks programmatic install) -->
 <div class="ios-hint hidden" id="iosHint">
@@ -1134,6 +1204,7 @@ function gameOver(){
     document.getElementById('goScore').textContent = score;
     document.getElementById('goBest').textContent = 'BEST ' + best;
     document.getElementById('goNew').classList.toggle('hidden', !isNew);
+    if (typeof resetJoin === 'function') resetJoin();   // fresh join form each round
     hud.classList.add('hidden');
     goEl.classList.remove('hidden');
   }, 650);
@@ -1198,6 +1269,92 @@ installBtn && installBtn.addEventListener('click', async () => {
   }
 });
 iosHint && iosHint.addEventListener('click', () => iosHint.classList.add('hidden'));
+
+// ============================================================= weekly scoreboard
+const boardEl   = document.getElementById('board');
+const boardList = document.getElementById('boardList');
+const boardReset= document.getElementById('boardReset');
+const joinBox   = document.getElementById('joinBox');
+const joinName  = document.getElementById('joinName');
+const joinIg    = document.getElementById('joinIg');
+const joinBtn   = document.getElementById('joinBtn');
+const joinMsg   = document.getElementById('joinMsg');
+let boardFrom = 'menu', countdownTimer = null, submittedThisRound = false;
+
+joinName.value = localStorage.getItem('fuelName') || '';
+joinIg.value   = localStorage.getItem('fuelIg')   || '';
+
+function resetJoin(){
+  submittedThisRound = false;
+  joinBtn.disabled = false;
+  joinMsg.classList.add('hidden'); joinMsg.textContent = '';
+}
+function esc(s){ return (s||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function fmtCountdown(){
+  if (!window.fuelboard) return '';
+  const ms = window.fuelboard.nextReset().getTime() - Date.now();
+  if (ms <= 0) return 'Resetting now…';
+  const d = Math.floor(ms/86400000), h = Math.floor(ms/3600000)%24, m = Math.floor(ms/60000)%60;
+  return '⏱ Resets in ' + (d ? d+'d ' : '') + h + 'h ' + m + 'm';
+}
+function tickCountdown(){ boardReset.textContent = fmtCountdown(); }
+function renderBoard(rows){
+  if (!rows || !rows.length){
+    boardList.innerHTML = '<div class="board-empty">No scores yet this week.<br>Be the first — play and submit your score! ⚡</div>';
+    return;
+  }
+  const myName = (localStorage.getItem('fuelName')||'').trim().toLowerCase();
+  boardList.innerHTML = rows.map((r,i)=>{
+    const top = i===0 ? ' top' : '';
+    const me  = myName && (r.name||'').trim().toLowerCase()===myName ? ' me' : '';
+    const ig  = r.instagram ? ' <span class="ig">@'+esc(r.instagram)+'</span>' : '';
+    const rk  = i===0 ? '🥇' : (i+1);
+    return '<div class="brow'+top+me+'"><div class="rk">'+rk+'</div>'+
+           '<div class="nm">'+esc(r.name)+ig+'</div><div class="sc">'+r.score+'</div></div>';
+  }).join('');
+}
+async function openBoard(from){
+  boardFrom = from || 'menu';
+  audio(); sfx.click();
+  document.getElementById('menu').classList.add('hidden');
+  goEl.classList.add('hidden'); hud.classList.add('hidden');
+  boardEl.classList.remove('hidden');
+  tickCountdown();
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = setInterval(tickCountdown, 30000);
+  boardList.innerHTML = '<div class="board-empty">Loading…</div>';
+  if (!window.fuelboard){ boardList.innerHTML = '<div class="board-empty">Couldn’t connect.<br>Check your internet and try again.</div>'; return; }
+  try { renderBoard(await window.fuelboard.fetchWeek()); }
+  catch(e){ boardList.innerHTML = '<div class="board-empty">Couldn’t load the board.<br>Try again in a moment.</div>'; }
+}
+function closeBoard(){
+  if (countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
+  boardEl.classList.add('hidden');
+  if (boardFrom === 'gameover') goEl.classList.remove('hidden');
+  else document.getElementById('menu').classList.remove('hidden');
+}
+document.getElementById('menuBoardBtn').addEventListener('click', () => openBoard('menu'));
+document.getElementById('goBoardBtn').addEventListener('click', () => openBoard('gameover'));
+document.getElementById('boardBack').addEventListener('click', () => { audio(); sfx.click(); closeBoard(); });
+
+joinBtn.addEventListener('click', async () => {
+  audio();
+  const nm = joinName.value.trim(), ig = joinIg.value.trim().replace(/^@+/, '');
+  if (!nm){ joinMsg.textContent='Please enter your name.'; joinMsg.className='join-msg err'; joinName.focus(); return; }
+  if (submittedThisRound) return;
+  if (!window.fuelboard){ joinMsg.textContent='No connection — try again.'; joinMsg.className='join-msg err'; return; }
+  localStorage.setItem('fuelName', nm); localStorage.setItem('fuelIg', ig);
+  joinBtn.disabled = true; joinMsg.className='join-msg'; joinMsg.textContent='Submitting…';
+  try {
+    await window.fuelboard.submitScore(nm, ig, score);
+    submittedThisRound = true;
+    joinMsg.textContent = '✅ You’re on the board!';
+    sfx.record();
+  } catch(e){
+    joinMsg.textContent = '⚠️ Couldn’t submit — check your connection.';
+    joinMsg.className = 'join-msg err'; joinBtn.disabled = false;
+  }
+});
 
 // ============================================================= effects state
 let flash = 0, flashColor = '255,210,0';
@@ -1477,6 +1634,57 @@ document.addEventListener('visibilitychange', () => { last = performance.now(); 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
   }
+</script>
+
+<!-- Firebase: weekly leaderboard backend (exposes window.fuelboard) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp, Timestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZJLtdDdGkLteaSfTRehVoo_qbCu83NT0",
+    authDomain: "fuel-ninja-2ad32.firebaseapp.com",
+    projectId: "fuel-ninja-2ad32",
+    storageBucket: "fuel-ninja-2ad32.firebasestorage.app",
+    messagingSenderId: "445979033612",
+    appId: "1:445979033612:web:db668f6c17928ac55f2e29"
+  };
+  const db = getFirestore(initializeApp(firebaseConfig));
+  const OFF = 3 * 3600 * 1000;            // Amman = UTC+3 (no DST)
+
+  // most recent Friday 00:00 Amman, as a real UTC instant
+  function weekStart(){
+    const a = new Date(Date.now() + OFF);             // Amman wall-clock read via UTC getters
+    const daysSinceFri = (a.getUTCDay() - 5 + 7) % 7; // Fri = 5
+    const wall = Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate() - daysSinceFri, 0, 0, 0, 0);
+    return new Date(wall - OFF);
+  }
+  function nextReset(){ return new Date(weekStart().getTime() + 7*24*3600*1000); }
+
+  async function submitScore(name, ig, score){
+    name = (name || '').toString().trim().slice(0, 24) || 'Anonymous';
+    ig   = (ig   || '').toString().trim().replace(/^@+/, '').slice(0, 30);
+    score = Math.max(0, Math.min(100000, Math.floor(Number(score) || 0)));
+    await addDoc(collection(db, 'scores'), { name, instagram: ig, score, createdAt: serverTimestamp() });
+  }
+
+  async function fetchWeek(){
+    const q = query(
+      collection(db, 'scores'),
+      where('createdAt', '>=', Timestamp.fromDate(weekStart())),
+      orderBy('createdAt', 'desc'),
+      limit(300)
+    );
+    const snap = await getDocs(q);
+    const rows = [];
+    snap.forEach(d => { const x = d.data(); rows.push({ name: x.name, instagram: x.instagram, score: x.score|0 }); });
+    rows.sort((a, b) => b.score - a.score);
+    return rows.slice(0, 10);
+  }
+
+  window.fuelboard = { submitScore, fetchWeek, nextReset };
+  window.dispatchEvent(new Event('fuelboard-ready'));
 </script>
 </body>
 </html>
