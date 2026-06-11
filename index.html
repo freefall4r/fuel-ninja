@@ -258,13 +258,6 @@
   </div>
 </div>
 
-<!-- ROTATE TO LANDSCAPE (phones) -->
-<div id="rotate">
-  <div class="ph">📱</div>
-  <div class="r1">ROTATE YOUR PHONE</div>
-  <div class="r2">لِفّ جهازك بالعرض 🔁</div>
-</div>
-
 <script>
 (() => {
 "use strict";
@@ -297,19 +290,21 @@ function resize(){
 }
 window.addEventListener('resize', resize);
 
-// ============================================================= orientation (force landscape on phones)
-const rotateEl = document.getElementById('rotate');
-const isTouch = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || (navigator.maxTouchPoints||0) > 0;
-let portraitPaused = false;
-function checkOrientation(){
-  const portrait = window.innerHeight > window.innerWidth;
-  const need = isTouch && portrait;
-  rotateEl.classList.toggle('show', need);
-  document.body.classList.toggle('rotated', need);
-  portraitPaused = need;
+// ============================================================= orientation
+// No "rotate your phone" gate — the game just runs. Where the browser allows it
+// (installed app / fullscreen on Android) we auto-lock to landscape silently.
+function lockLandscape(){
+  try{
+    if (screen.orientation && screen.orientation.lock){
+      const p = screen.orientation.lock('landscape');
+      if (p && p.catch) p.catch(()=>{});
+    }
+  }catch(e){}
 }
-window.addEventListener('resize', checkOrientation);
-window.addEventListener('orientationchange', () => { setTimeout(() => { resize(); checkOrientation(); }, 80); });
+function checkOrientation(){ lockLandscape(); }   // best-effort, silent
+window.addEventListener('orientationchange', () => { setTimeout(resize, 80); });
+document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement) lockLandscape(); });
+document.addEventListener('webkitfullscreenchange', () => { if (document.webkitFullscreenElement) lockLandscape(); });
 
 // ============================================================= brand logo
 // FUEL BURGER wordmark as a lit sign on the food-truck's back wall
@@ -1120,8 +1115,9 @@ function goFullscreen(){
     const el = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement){
       const req = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen;
-      if (req) req.call(el);
+      if (req){ const r = req.call(el); if (r && r.then) r.then(lockLandscape).catch(()=>{}); }
     }
+    lockLandscape();   // also try directly (installed / already-fullscreen case)
   }catch(e){}
 }
 document.getElementById('playBtn').addEventListener('click', () => { audio(); goFullscreen(); sfx.rev(); startGame(); });
@@ -1186,8 +1182,6 @@ let last = performance.now();
 function frame(now){
   let dt = (now - last) / 16.667; last = now;
   dt = Math.min(dt, 3);
-  // freeze everything while the phone is held in portrait (rotate prompt up)
-  if (portraitPaused){ requestAnimationFrame(frame); return; }
   // hitstop / slow-mo: gameplay runs on gdt, ease back to full speed
   const gdt = dt * slowmo;
   slowmo = Math.min(1, slowmo + 0.045*dt);
