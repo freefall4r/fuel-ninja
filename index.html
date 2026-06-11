@@ -171,17 +171,19 @@
 
   /* ---------- compact menus on short (landscape phone) screens ---------- */
   @media (max-height:520px){
-    .overlay{justify-content:flex-start;overflow-y:auto;padding:10px 16px;}
-    .super{margin-bottom:6px;font-size:11px;padding:4px 10px;}
+    .overlay{justify-content:center;overflow-y:auto;padding:8px 16px;}
+    .super{margin-bottom:5px;font-size:11px;padding:4px 10px;}
     .logo .l1{font-size:clamp(30px,11vh,56px);}
     .logo .l2{font-size:clamp(22px,8vh,42px);}
     .logo-rule{margin:4px auto 2px;height:4px;}
-    .ninja-tag{font-size:15px;margin-top:5px;letter-spacing:8px;}
-    .tag{margin-top:7px;font-size:12px;line-height:1.35;}
-    .menu-strip{margin:9px 0 2px;gap:6px;}
+    .brandbadge{padding:7px 18px;border-radius:10px;}
+    .brandlogo{height:clamp(32px,8vh,58px);}
+    .ninja-tag{font-size:14px;margin-top:4px;letter-spacing:7px;}
+    .tag{margin-top:5px;font-size:11px;line-height:1.3;}
+    .menu-strip{margin:7px 0 2px;gap:6px;}
     .chip{font-size:11px;padding:4px 9px;}
-    .btn{margin-top:11px;padding:9px 38px;font-size:21px;}
-    .hint{margin-top:7px;}
+    .btn{margin-top:9px;padding:9px 38px;font-size:21px;}
+    .hint{display:none;}            /* free a line on short screens for the install CTA */
     .go-title{font-size:clamp(30px,11vh,60px);}
     .go-score .val{font-size:54px;}
     .hud-score .val{font-size:34px;}
