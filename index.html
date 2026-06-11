@@ -7,6 +7,13 @@
 <meta name="theme-color" content="#0a0b0e" />
 <title>FUEL ⚡ Ninja — Abdoun, Amman</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0b0e'/%3E%3Cpath d='M19 3 L8 18 H15 L13 29 L24 12 H17 Z' fill='%23e63436'/%3E%3C/svg%3E" />
+<!-- PWA / Add to Home Screen -->
+<link rel="manifest" href="manifest.json" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FUEL Ninja" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cairo:wght@700;900&display=swap" rel="stylesheet">
@@ -1365,6 +1372,12 @@ requestAnimationFrame(frame);
 // keep things sane if tab was hidden
 document.addEventListener('visibilitychange', () => { last = performance.now(); });
 })();
+</script>
+<script>
+  /* register the service worker so the installed app works offline */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  }
 </script>
 </body>
 </html>
